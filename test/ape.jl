@@ -59,6 +59,18 @@
             @test DNA(DNAbin_Gap) === DNA_Gap
         end
 
+        @testset "Char" begin
+            @testset "DNAbin conversions from Char" begin
+                @test convert(DNAbin, 'A') === DNAbin_A
+                @test convert(DNAbin, 'C') === DNAbin_C
+                @test convert(DNAbin, 'G') === DNAbin_G
+                @test convert(DNAbin, 'T') === DNAbin_T
+                @test convert(DNAbin, 'N') === DNAbin_N
+                @test_throws InexactError convert(DNA, 'Z')
+                @test_throws InexactError convert(DNA, '核')
+            end
+        end
+
     end
 
 end

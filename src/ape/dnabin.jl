@@ -46,15 +46,23 @@ end
 
 # Conversion between DNAbin and DNA.
 
-@inline function Base.convert(::Type{DNAbin}, nt::DNA)
+@inline function _DNA_to_raw(nt::DNA)
     db = swapbits(UInt8(nt), 0, 3) << 4
     db |= ifelse(iscertain(nt), 0x08, 0x00)
     db |= ifelse(isgap(nt), 0x04, 0x00)
-    return DNAbin(db)
+    return db
+end
+
+@inline function Base.convert(::Type{DNAbin}, nt::DNA)
+    return DNAbin(_DNA_to_raw(nt))
+end
+
+@inline function _raw_to_DNA(x::UInt8)
+    return swapbits(x, 4, 7) >> 4
 end
 
 @inline function Base.convert(::Type{BioSymbols.DNA}, nt::DNAbin)
-    return BioSymbols.DNA(swapbits(UInt8(nt), 4, 7) >> 4)
+    return BioSymbols.DNA(_raw_to_DNA(UInt8(nt)))
 end
 
 # Conversion between DNAbin and characters.
@@ -78,10 +86,7 @@ end
 # Show / print
 # ------------
 
-BioSymbols.showprefix(::Type{DNAbin}) = "DNAbin"
-
-
-
+BioSymbols.prefix(::Type{DNAbin}) = "DNAbin"
 
 
 # Basic operators
@@ -99,50 +104,26 @@ end
     return reinterpret(DNAbin,0x04)
 end
 
-"""
-    isGC(nt::NucleicAcid)
-Test if `nt` is surely either guanine or cytosine.
-"""
 @inline function BioSymbols.isGC(nt::DNAbin)
     return Bool((nt & 0x28) | (nt & 0x48))
 end
 
-"""
-    ispurine(nt::DNAbin)
-Test if `nt` is surely a purine.
-"""
 @inline function BioSymbols.ispurine(nt::DNAbin)
     return (UInt8(nt) & 0xC8) > 0xC0
 end
 
-"""
-    ispyrimidine(nt::NucleicAcid)
-Test if `nt` is surely a pyrimidine.
-"""
 @inline function BioSymbols.ispyrimidine(nt::DNAbin)
     return (UInt8(nt) & 0x08) > 0x30
 end
 
-"""
-    isambiguous(nt::NucleicAcid)
-Test if `nt` is ambiguous nucleotide.
-"""
 @inline function BioSymbols.isambiguous(nt::DNAbin)
     return (nt & 0x08) == 0x00
 end
 
-"""
-    iscertain(nt::NucleicAcid)
-Test if `nt` is a non-ambiguous nucleotide e.g. ACGT.
-"""
 @inline function BioSymbols.iscertain(nt::DNAbin)
     return (nt & 0x08) == 0x08
 end
 
-"""
-    isgap(nt::NucleicAcid)
-Test if `nt` is a gap.
-"""
 @inline function BioSymbols.isgap(nt::DNAbin)
     return nt == 0x04
 end
