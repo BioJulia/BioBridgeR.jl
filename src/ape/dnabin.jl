@@ -8,8 +8,8 @@
 
 primitive type DNAbin <: NucleicAcid 8 end
 
-const char_to_dna = [0x02 for _ in 0x00:0xff]
-const dna_to_char = Vector{Char}(16)
+const char_to_dnabin = [0x02 for _ in 0x00:0xff]
+const dnabin_to_char = ['?' for _ in 0x01:0xed]
 
 # derived from "The DDBJ/ENA/GenBank Feature Table Definition"
 # §7.4.1 Nucleotide base code (IUPAC)
@@ -35,8 +35,8 @@ for (char, doc, bits) in [
     var = Symbol("DNAbin_", char != '-' ? char : "Gap")
     @eval begin
         @doc $(doc) const $(var) = reinterpret(DNAbin, $(bits))
-        char_to_dna[$(Int(char) + 1)] = char_to_dna[$(Int(lowercase(char)) + 1)] = $(bits)
-        #dna_to_char[$(Int(bits)+1)] = $(char)
+        char_to_dnabin[$(Int(char) + 1)] = char_to_dnabin[$(Int(lowercase(char)) + 1)] = $(bits)
+        dnabin_to_char[$(Int(bits) - 3)] = $(char)
     end
 end
 
@@ -47,7 +47,8 @@ end
 # Conversion between DNAbin and DNA.
 
 @inline function _DNA_to_raw(nt::DNA)
-    db = swapbits(UInt8(nt), 0, 3) << 4
+    bits = UInt8(nt)
+    db = swapbits(bits, 0, 3) << 4
     db |= ifelse(iscertain(nt), 0x08, 0x00)
     db |= ifelse(isgap(nt), 0x04, 0x00)
     return db
@@ -67,21 +68,27 @@ end
 
 # Conversion between DNAbin and characters.
 
-@inline function _unsafe_convert(::Type{DNAbin}, nt::Char)
-    @inbounds return char_to_dna[Int(c) + 1]
-end
-
 @inline function Base.convert(::Type{DNAbin}, c::Char)
     if c > '\xff'
         throw(InexactError())
     end
-    nt = _unsafe_convert(DNAbin, c)
+    @inbounds nt = char_to_dnabin[Int(c) + 1]
     if (nt & 0x02) > 0
         throw(InexactError())
     end
-    return nt
+    return DNAbin(nt)
 end
 
+@inline function Base.convert(::Type{Char}, nt::DNAbin)
+    @inbounds return dnabin_to_char[Int(nt) - 3]
+end
+
+# Alphabet
+# --------
+
+@eval @inline function BioSymbols.alphabet(::Type{DNAbin})
+    return $(tuple([DNAbin(BioSymbols.DNA(x)) for x in 0b0000:0b1111]...))
+end
 
 # Show / print
 # ------------
@@ -117,7 +124,7 @@ end
 end
 
 @inline function BioSymbols.isambiguous(nt::DNAbin)
-    return (nt & 0x08) == 0x00
+    return (nt & 0x0C) == 0x00
 end
 
 @inline function BioSymbols.iscertain(nt::DNAbin)
@@ -126,4 +133,14 @@ end
 
 @inline function BioSymbols.isgap(nt::DNAbin)
     return nt == 0x04
+end
+
+@inline function BioSymbols.iscompatible(x::DNAbin, y::DNAbin)
+    return (UInt8(x) >> 4) & (UInt8(y) >> 4) != 0
+end
+
+@inline function BioSymbols.complement(x::DNAbin)
+    bits = UInt8(x)
+    return DNAbin((bits & 0x10) << 3 | (bits & 0x80) >> 3 |
+        (bits & 0x20) << 1 | (bits & 0x40) >> 1)
 end

@@ -66,11 +66,37 @@
                 @test convert(DNAbin, 'G') === DNAbin_G
                 @test convert(DNAbin, 'T') === DNAbin_T
                 @test convert(DNAbin, 'N') === DNAbin_N
-                @test_throws InexactError convert(DNA, 'Z')
-                @test_throws InexactError convert(DNA, '核')
+                @test_throws InexactError convert(DNAbin, 'Z')
+                @test_throws InexactError convert(DNAbin, '核')
+            end
+
+            @testset "DNAbin conversions to Char" begin
+                @test convert(Char, DNAbin_A) == 'A'
+                @test convert(Char, DNAbin_C) == 'C'
+                @test convert(Char, DNAbin_G) == 'G'
+                @test convert(Char, DNAbin_T) == 'T'
+                @test convert(Char, DNAbin_N) == 'N'
             end
         end
 
+    end
+
+    @testset "iscompatible" begin
+        @test  iscompatible(DNAbin_A, DNAbin_A)
+        @test  iscompatible(DNAbin_A, DNAbin_R)
+        @test !iscompatible(DNAbin_C, DNAbin_A)
+        @test !iscompatible(DNAbin_C, DNAbin_R)
+
+        for x in alphabet(DNAbin)
+            @test iscompatible(x, DNAbin_N) == (x != DNAbin_Gap)
+            @test iscompatible(DNAbin_N, x) == (x != DNAbin_Gap)
+        end
+    end
+
+    @testset "isambiguous" begin
+        for nt in alphabet(DNAbin)
+            @test isambiguous(nt) == (nt ∉ (DNAbin_A, DNAbin_C, DNAbin_G, DNAbin_T, DNAbin_Gap))
+        end
     end
 
 end
