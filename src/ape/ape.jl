@@ -33,7 +33,6 @@ export
     DNAbin_N,
     DNAbin_Gap
 
-
 import BioSymbols: BioSymbols, NucleicAcid
 using BioSequences: BioSequence, DNA, iscertain, isgap
 using Twiddle: swapbits
