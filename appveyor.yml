@@ -2,10 +2,10 @@ environment:
   matrix:
   - Julia_URL: "https://julialang-s3.julialang.org/bin/winnt/x64/0.6/julia-0.6-latest-win64.exe"
 
-branches:
-  only:
-    - master
-    - /release-.*/
+#branches:
+#  only:
+#    - master
+#    - /release-.*/
 
 notifications:
   - provider: Email
