@@ -339,23 +339,48 @@ DNA_R
 
 
 <p>DNA sequences in R, represented as a <code>DNAbin</code> object can be transferred into a julia as an <code>Array{DNAbin,2}</code>, or (by default) as a <code>BioSequence{DNAAlphabet{4}}</code> type as defined in <a href="https://github.com/BioJulia/BioSequences.jl">BioSequences.jl</a>:</p>
-<div class="codehilite"><pre><span></span>julia<span class="o">&gt;</span> R<span class="s">&quot;&quot;&quot;</span>
-<span class="s">       library(ape)</span>
-<span class="s">       mseqs &lt;- data(woodmouse)</span>
-<span class="s">       &quot;&quot;&quot;</span>
-RCall.RObject<span class="p">{</span>RCall.StrSxp<span class="p">}</span>
-<span class="p">[</span><span class="m">1</span><span class="p">]</span> <span class="s">&quot;woodmouse&quot;</span>
+<div class="codehilite"><pre><span></span>julia&gt; R&quot;&quot;&quot;
+       library(ape)
+       data(woodmouse)
+       &quot;&quot;&quot;
+RCall.RObject{RCall.StrSxp}
+[1] &quot;woodmouse&quot;
 
-julia<span class="o">&gt;</span> <span class="o">@</span>rget mseqs<span class="o">::</span>Array<span class="p">{</span>DNAbin<span class="p">,</span><span class="m">2</span><span class="p">}</span>
-ERROR<span class="o">:</span> MethodError<span class="o">:</span> no method matching rcopy<span class="p">(</span><span class="o">::</span>Type<span class="p">{</span>Array<span class="p">{</span>BioBridgeR.APE.DNAbin<span class="p">,</span><span class="m">2</span><span class="p">}},</span> <span class="o">::</span>Ptr<span class="p">{</span>RCall.StrSxp<span class="p">})</span>
-Closest candidates are<span class="o">:</span>
-  rcopy<span class="p">(</span><span class="o">!</span>Matched<span class="o">::</span>Type<span class="p">{</span>Symbol<span class="p">},</span> <span class="o">::</span>Ptr<span class="p">{</span>RCall.StrSxp<span class="p">})</span> at <span class="o">/</span>home<span class="o">/</span>travis<span class="o">/</span><span class="m">.</span>julia<span class="o">/</span>v0.6<span class="o">/</span>RCall<span class="o">/</span>src<span class="o">/</span>convert<span class="o">/</span>base.jl<span class="o">:</span><span class="m">137</span>
-  rcopy<span class="p">(</span><span class="o">::</span>Type<span class="p">{</span>Array<span class="p">{</span>BioBridgeR.APE.DNAbin<span class="p">,</span><span class="m">2</span><span class="p">}},</span> <span class="o">!</span>Matched<span class="o">::</span>Ptr<span class="p">{</span>RCall.RawSxp<span class="p">})</span> at <span class="o">/</span>home<span class="o">/</span>travis<span class="o">/</span><span class="m">.</span>julia<span class="o">/</span>v0.6<span class="o">/</span>BioBridgeR<span class="o">/</span>src<span class="o">/</span>ape<span class="o">/</span>dnabin.jl<span class="o">:</span><span class="m">163</span>
-  rcopy<span class="p">(</span><span class="o">::</span>Type<span class="p">{</span><span class="bp">T</span><span class="p">},</span> <span class="o">!</span>Matched<span class="o">::</span>RCall.RObject<span class="p">;</span> kwargs...<span class="p">)</span> where <span class="bp">T</span> at <span class="o">/</span>home<span class="o">/</span>travis<span class="o">/</span><span class="m">.</span>julia<span class="o">/</span>v0.6<span class="o">/</span>RCall<span class="o">/</span>src<span class="o">/</span>convert<span class="o">/</span>base.jl<span class="o">:</span><span class="m">5</span>
-  <span class="kc">...</span>
+julia&gt; @rget woodmouse::Array{DNAbin,2}
+15×965 Array{BioBridgeR.APE.DNAbin,2}:
+ DNAbin_N  DNAbin_T  DNAbin_T  DNAbin_C  …  DNAbin_A  DNAbin_T  DNAbin_A
+ DNAbin_A  DNAbin_T  DNAbin_T  DNAbin_C     DNAbin_G  DNAbin_T  DNAbin_N
+ DNAbin_A  DNAbin_T  DNAbin_T  DNAbin_C     DNAbin_A  DNAbin_T  DNAbin_A
+ DNAbin_A  DNAbin_T  DNAbin_T  DNAbin_C     DNAbin_N  DNAbin_N  DNAbin_N
+ DNAbin_A  DNAbin_T  DNAbin_T  DNAbin_C     DNAbin_N  DNAbin_N  DNAbin_N
+ DNAbin_A  DNAbin_T  DNAbin_T  DNAbin_C  …  DNAbin_N  DNAbin_N  DNAbin_N
+ DNAbin_A  DNAbin_T  DNAbin_T  DNAbin_C     DNAbin_N  DNAbin_N  DNAbin_N
+ DNAbin_A  DNAbin_T  DNAbin_T  DNAbin_C     DNAbin_N  DNAbin_N  DNAbin_N
+ DNAbin_A  DNAbin_T  DNAbin_T  DNAbin_C     DNAbin_N  DNAbin_N  DNAbin_N
+ DNAbin_A  DNAbin_T  DNAbin_T  DNAbin_C     DNAbin_N  DNAbin_N  DNAbin_N
+ DNAbin_A  DNAbin_T  DNAbin_T  DNAbin_C  …  DNAbin_N  DNAbin_N  DNAbin_N
+ DNAbin_N  DNAbin_N  DNAbin_N  DNAbin_N     DNAbin_N  DNAbin_N  DNAbin_N
+ DNAbin_A  DNAbin_T  DNAbin_T  DNAbin_C     DNAbin_N  DNAbin_N  DNAbin_N
+ DNAbin_A  DNAbin_T  DNAbin_T  DNAbin_C     DNAbin_N  DNAbin_N  DNAbin_N
+ DNAbin_N  DNAbin_N  DNAbin_N  DNAbin_C     DNAbin_N  DNAbin_N  DNAbin_N
 
-julia<span class="o">&gt;</span> <span class="o">@</span>rget mseqs
-<span class="s">&quot;woodmouse&quot;</span>
+julia&gt; @rget woodmouse
+15-element Array{BioSequences.BioSequence{BioSequences.DNAAlphabet{4}},1}:
+ NTTCGAAAAACACACCCACTACTAAAANTTATCAGTCAC…ACGCAGCCTAATATTCCGCCCAATTACTCAGACCCTATA
+ ATTCGAAAAACACACCCACTACTAAAAATTATCAACCAC…ACGCAGCCTAATATTCCGCCCAATTACTCAAACCCTGTN
+ ATTCGAAAAACACACCCACTACTAAAAATTATCAATCAC…ACGCAGCCTAATATTCCGCCCAATTACTCAAACCCTATA
+ ATTCGAAAAACACACCCACTACTAAAAATCATCAATCAC…ACGCAGCCTAATATTCCGCCCAATTACTCAAATACNNNN
+ ATTCGAAAAACACACCCACTACTAAAAATTATCAATCAC…ACGCAGCCTAATATTCCGCCCAATTACTCAAACCCNNNN
+ ATTCGAAAAACACACCCACTACTAAAAATTATCAATCAC…ACGCAGCCTAATATTCCGCCCAATTACTCAAACCCNNNN
+ ATTCGAAAAACACACCCACTACTAAAAATTATCAATCAC…ACGCAGCCTAATATTCCGCCCAATTACTCAAACCCNNNN
+ ATTCGAAAAACACACCCACTACTAAAAATTATCAATCAC…ACGCAGCCTAATATTCCGCCCAATTACTCAAACCCNNNN
+ ATTCGAAAAACACACCCACTACTAAAAATTATCAACCAC…ACGCAGCCTAATATTCCGCCCAATTACTCAAACCCNNNN
+ ATTCGAAAAACACACCCACTACTAAAAATTATTAATCAC…ACGCAGCCTAATATTCCGCCCAATTACTCAAACCCNNNN
+ ATTCGAAAAACACACCCACTACTAAAAATTATCAATCAC…ACGCAGCCTAATATTCCGCCCAATTACTCAAACCCNNNN
+ NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN…ACGCAGCCTAATATTCCGCCCAATTACTCAAACCCNNNN
+ ATTCGAAAAACACACCCACTACTAAAAATTATCAATCAC…ACGCAGCCTAATATTCCGCCCAATTACTCAAACCCNNNN
+ ATTCGAAAAACACACCCACTACTAAAAATTATCAATCAC…ACGCAGCCTAATATTCCGCCCAATTACTCAAACCCNNNN
+ NNNCGAAAAACACACCCACTACTAAAAATTATCAATCAC…ACGCAGCCTAATATTCCGCCCAATTACTCAAACCCNNNN
 </pre></div>
 
 
@@ -368,7 +393,7 @@ julia<span class="o">&gt;</span> <span class="o">@</span>rget mseqs
  <span class="n">GGGGG</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="p">@</span><span class="n">rput</span> <span class="n">sequences</span><span class="o">::</span><span class="n">RawSxp</span>
-<span class="n">Ptr</span><span class="p">{</span><span class="n">RCall</span><span class="p">.</span><span class="n">RawSxp</span><span class="p">}</span> <span class="mh">@0x0000000005feb040</span>
+<span class="n">Ptr</span><span class="p">{</span><span class="n">RCall</span><span class="p">.</span><span class="n">RawSxp</span><span class="p">}</span> <span class="mh">@0x0000000007894aa8</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="n">R</span><span class="s">&quot;sequences&quot;</span>
 <span class="n">RCall</span><span class="p">.</span><span class="n">RObject</span><span class="p">{</span><span class="n">RCall</span><span class="p">.</span><span class="n">RawSxp</span><span class="p">}</span>
