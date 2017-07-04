@@ -27,11 +27,18 @@ install:
 # Run installer silently, output to C:\projects\julia
   - C:\projects\julia-binary.exe /S /D=C:\projects\julia
 
+# Download and install R binary
+  - ps: |
+      (new-object net.webclient).DownloadString("http://cran.rstudio.com/bin/windows/base/") -match 'href="(R-[0-9.]*[a-zA-Z]*-win.exe)"';
+      (new-object net.webclient).DownloadFile($("http://cran.rstudio.com/bin/windows/base/"+$matches[1]),"C:\projects\R-binary.exe")
+  - C:\projects\R-binary.exe /VERYSILENT /DIR=C:\projects\R
+
 build_script:
 # Need to convert from shallow to complete for Pkg.clone to work
   - IF EXIST .git\shallow (git fetch --unshallow)
   - C:\projects\julia\bin\julia -e "versioninfo();
-      Pkg.clone(pwd(), \"BioSequences\"); Pkg.build(\"BioBridgeR\")"
+      Pkg.clone(pwd(), \"BioBridgeR\"); Pkg.build(\"BioBridgeR\")"
+  - C:\projects\R\bin\Rscript.exe -e "install.packages('ape', repos='http://cran.rstudio.com/')"
 
 test_script:
   - C:\projects\julia\bin\julia -e "Pkg.test(\"BioBridgeR\")"
