@@ -40,7 +40,6 @@ for (char, doc, bits) in [
     end
 end
 
-
 # Conversion
 # ----------
 
@@ -86,7 +85,7 @@ end
 # Alphabet
 # --------
 
-@eval @inline function BioSymbols.alphabet(::Type{DNAbin})
+@eval function BioSymbols.alphabet(::Type{DNAbin})
     return $(tuple([DNAbin(BioSymbols.DNA(x)) for x in 0b0000:0b1111]...))
 end
 
@@ -112,27 +111,27 @@ end
 end
 
 @inline function BioSymbols.isGC(nt::DNAbin)
-    return Bool((nt & 0x28) | (nt & 0x48))
+    return UInt8(nt) & 0x96 == 0x00
 end
 
 @inline function BioSymbols.ispurine(nt::DNAbin)
-    return (UInt8(nt) & 0xC8) > 0xC0
+    return (UInt8(nt) & 0x36) == 0x00
 end
 
 @inline function BioSymbols.ispyrimidine(nt::DNAbin)
-    return (UInt8(nt) & 0x08) > 0x30
+    return (UInt8(nt) & 0xC6) == 0x00
 end
 
 @inline function BioSymbols.isambiguous(nt::DNAbin)
-    return (nt & 0x0C) == 0x00
+    return (UInt8(nt) & 0x0C) == 0x00
 end
 
 @inline function BioSymbols.iscertain(nt::DNAbin)
-    return (nt & 0x08) == 0x08
+    return (UInt8(nt) & 0x08) == 0x08
 end
 
 @inline function BioSymbols.isgap(nt::DNAbin)
-    return nt == 0x04
+    return nt === DNAbin_Gap
 end
 
 @inline function BioSymbols.iscompatible(x::DNAbin, y::DNAbin)
@@ -142,5 +141,96 @@ end
 @inline function BioSymbols.complement(x::DNAbin)
     bits = UInt8(x)
     return DNAbin((bits & 0x10) << 3 | (bits & 0x80) >> 3 |
-        (bits & 0x20) << 1 | (bits & 0x40) >> 1)
+        (bits & 0x20) << 1 | (bits & 0x40) >> 1 | (bits & 0x0F))
+end
+
+@inline function BioSymbols.isvalid(x::DNAbin)
+    return (UInt8(x) & 0x03) == 0x00
+end
+
+
+# Tranfer of data to and from R
+# -----------------------------
+
+@inline function check_class(rs::Ptr{RawSxp})
+    if !isObject(rs) || isS4(rs) || rcopy(rcall_p(:class, rs)) != "DNAbin"
+        error("Object is not of S3 class DNAbin, aborting")
+    end
+end
+
+function rcopy(::Type{Array{DNAbin,2}}, rs::Ptr{RawSxp})
+    # protect the RawSxp from GC.
+    protect(rs)
+
+    # Check class of RawSxp.
+    check_class(rs)
+
+    # Initialize the output array.
+    seqs = Array{DNAbin, 2}(size(rs))
+
+    # Fill the array.
+    @inbounds for i ∈ 1:length(rs)
+        seqs[i] = DNAbin(rs[i])
+    end
+
+    # We no longer need to work with rs, stop protecting it from GC.
+    unprotect(1)
+    return seqs
+end
+
+function rcopy(::Type{Vector{DNASequence}}, rs::Ptr{RawSxp})
+    # protect the RawSxp from GC.
+    protect(rs)
+
+    # Check class of RawSxp.
+    check_class(rs)
+
+    nSeq, seqLen = size(rs)
+
+    # Initialize the output vector of biological sequences.
+    seqs = Vector{DNASequence}(nSeq)
+    for i in 1:nSeq
+        seqs[i] = DNASequence(seqLen)
+    end
+
+    # Fill output sequences, with data from rs.
+    @inbounds for i ∈ 1:nSeq, j ∈ 1:seqLen
+        seqs[i][j] = DNA(_raw_to_DNA(rs[i, j]))
+    end
+
+    # We no longer need to work with rs, stop protecting it from GC.
+    unprotect(1)
+    return seqs
+end
+
+@inline function rcopytype(::Type{RClass{:DNAbin}}, s::Ptr{RawSxp})
+    return Vector{DNASequence}
+end
+
+function sexp(::Type{RawSxp}, seq::Array{DNAbin,2})
+    ra = protect(allocArray(RawSxp, size(seq)...))
+    @inbounds for i ∈ 1:endof(seq)
+        ra[i] = UInt8(seq[i])
+    end
+    setclass!(ra, sexp("DNAbin"))
+    unprotect(1)
+    return ra
+end
+
+function sexp{A<:DNAAlphabet}(::Type{RawSxp}, seq::Vector{BioSequence{A}})
+    ncols = length(seq[1])
+    @inbounds for i ∈ 2:endof(seq)
+        if length(seq[i]) != ncols
+            error("Sequences must all be the same length")
+        end
+    end
+    ra = protect(allocArray(RawSxp, length(seq), ncols))
+    z = 1
+    @inbounds for j ∈ 1:ncols, i ∈ 1:endof(seq)
+        ra[z] = _DNA_to_raw(seq[i][j])
+        z += 1
+    end
+    setclass!(ra, sexp("DNAbin"))
+    unprotect(1)
+    return ra
 end

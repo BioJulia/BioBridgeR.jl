@@ -147,4 +147,24 @@
         @test String(take!(buf)) == "DNAbin_A DNAbin_C DNAbin_G DNAbin_T DNAbin_N DNAbin_Gap "
     end
 
+    @testset "Data transfer" begin
+        rseq = R"""
+        library(ape)
+        a <- as.DNAbin(
+            matrix(
+                c('a', 't', 'c', 'g', 'a', 't', 'c', 'g', '-', 't', 'c', 'm'),
+                nrow = 3
+            )
+        )
+        """
+        dba = [DNAbin_A  DNAbin_G  DNAbin_C    DNAbin_T
+               DNAbin_T  DNAbin_A  DNAbin_G    DNAbin_C
+               DNAbin_C  DNAbin_T  DNAbin_Gap  DNAbin_M]
+        vs = DNASequence[dna"AGCT", dna"TAGC", dna"CT-M"]
+        @test rcopy(Array{DNAbin, 2}, rseq) == dba
+        @test rcopy(Vector{DNASequence}, rseq) == vs
+        @test all(i == j for (i, j) in zip(rseq, RObject(RCall.sexp(RCall.RawSxp, dba))))
+        @test all(i == j for (i, j) in zip(rseq, RObject(RCall.sexp(RCall.RawSxp, vs))))
+    end
+
 end

@@ -33,9 +33,12 @@ export
     DNAbin_N,
     DNAbin_Gap
 
+using BioSymbols: DNA, iscertain, isgap
 import BioSymbols: BioSymbols, NucleicAcid
-using BioSequences: BioSequence, DNA, iscertain, isgap
+using BioSequences: BioSequence, DNASequence, DNAAlphabet
 using Twiddle: swapbits
+using RCall: RawSxp, RClass, protect, unprotect, isObject, isS4, rcall_p, allocArray, setclass!
+import RCall: rcopy, rcopytype, sexp
 
 include("dnabin.jl")
 
