@@ -21,7 +21,7 @@ before_install:
 
     - mkdir -p mkdir $HOME/R/library
     - echo 'R_LIBS_USER="~/R/library"' >  $HOME/.Renviron
-    - echo 'options(repos=structure(c(CRAN="https://clour.r-project.org/")))' > .Rprofile
+    - echo 'options(repos=structure(c(CRAN="https://cloud.r-project.org/")))' > .Rprofile
     - Rscript -e 'install.packages("ape")'
 after_success:
   - julia -e 'cd(Pkg.dir("BioBridgeR")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
