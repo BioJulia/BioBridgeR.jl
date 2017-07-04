@@ -55,12 +55,12 @@ a julia as an `Array{DNAbin,2}`, or (by default) as a
 ```@repl ex1
 R"""
 library(ape)
-mseqs <- data(woodmouse)
+data(woodmouse)
 """
 
-@rget mseqs::Array{DNAbin,2}
+@rget woodmouse::Array{DNAbin,2}
 
-@rget mseqs
+@rget woodmouse
 ```
 
 Conversely, `Array{DNAbin, 2}` and `BioSequence{DNAAlphabet{4}}` variables
