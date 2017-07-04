@@ -1,0 +1,41 @@
+# Project information
+site_name:   BioBridgeR.jl
+site_description: Compatibility with R packages, for the BioJulia ecosystem
+site_author: The BioJulia Organisation
+site_url: https://biojulia.github.io/BioBridgeR.jl/
+
+# Repository
+repo_url:  https://github.com/BioJulia/BioBridgeR.jl
+
+# Copyright
+copyright: Copyright (c) 2017 Ben J. Ward
+
+# Documentation and theme
+theme: material
+docs_dir: 'build'
+
+# Options
+extra:
+  author:
+    github: BioJulia
+
+extra_css:
+  - assets/Documenter.css
+
+extra_javascript:
+  - https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML
+  - assets/mathjaxhelper.js
+
+# Extensions
+markdown_extensions:
+  - extra
+  - tables
+  - fenced_code
+  - codehilite
+  - def_list
+
+# Page tree
+pages:
+- Home: index.md
+- APE: ape.md
+- Contributing: contributing.md
