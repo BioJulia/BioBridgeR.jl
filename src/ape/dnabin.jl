@@ -159,11 +159,11 @@ end
 end
 
 function rcopy(::Type{Array{DNAbin,2}}, rs::Ptr{RawSxp})
-    # protect the RawSxp from GC.
-    protect(rs)
-
     # Check class of RawSxp.
     check_class(rs)
+
+    # Protect the RawSxp from GC.
+    protect(rs)
 
     # Initialize the output array.
     seqs = Array{DNAbin, 2}(size(rs))
@@ -179,11 +179,11 @@ function rcopy(::Type{Array{DNAbin,2}}, rs::Ptr{RawSxp})
 end
 
 function rcopy(::Type{Vector{DNASequence}}, rs::Ptr{RawSxp})
-    # protect the RawSxp from GC.
-    protect(rs)
-
     # Check class of RawSxp.
     check_class(rs)
+
+    # Protect the RawSxp from GC.
+    protect(rs)
 
     nSeq, seqLen = size(rs)
 
@@ -234,3 +234,5 @@ function sexp{A<:DNAAlphabet}(::Type{RawSxp}, seq::Vector{BioSequence{A}})
     unprotect(1)
     return ra
 end
+
+sexp(seq::Vector{BioSequence{A}}) = sexp(RawSxp, seq)
