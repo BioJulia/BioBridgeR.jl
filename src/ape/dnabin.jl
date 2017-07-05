@@ -61,7 +61,7 @@ end
     return swapbits(x, 4, 7) >> 4
 end
 
-@inline function Base.convert(::Type{BioSymbols.DNA}, nt::DNAbin)
+@inline function Base.convert(::Type{DNA}, nt::DNAbin)
     return BioSymbols.DNA(_raw_to_DNA(UInt8(nt)))
 end
 
@@ -158,12 +158,12 @@ end
     end
 end
 
-function rcopy(::Type{Array{DNAbin,2}}, rs::Ptr{RawSxp})
-    # protect the RawSxp from GC.
-    protect(rs)
-
+function rcopy(::Type{Array{DNAbin, 2}}, rs::Ptr{RawSxp})
     # Check class of RawSxp.
     check_class(rs)
+
+    # Protect the RawSxp from GC.
+    protect(rs)
 
     # Initialize the output array.
     seqs = Array{DNAbin, 2}(size(rs))
@@ -179,11 +179,11 @@ function rcopy(::Type{Array{DNAbin,2}}, rs::Ptr{RawSxp})
 end
 
 function rcopy(::Type{Vector{DNASequence}}, rs::Ptr{RawSxp})
-    # protect the RawSxp from GC.
-    protect(rs)
-
     # Check class of RawSxp.
     check_class(rs)
+
+    # Protect the RawSxp from GC.
+    protect(rs)
 
     nSeq, seqLen = size(rs)
 
@@ -217,7 +217,7 @@ function sexp(::Type{RawSxp}, seq::Array{DNAbin,2})
     return ra
 end
 
-function sexp{A<:DNAAlphabet}(::Type{RawSxp}, seq::Vector{BioSequence{A}})
+function sexp(::Type{RawSxp}, seq::Vector{BioSequence{A}}) where {A<:DNAAlphabet}
     ncols = length(seq[1])
     @inbounds for i ∈ 2:endof(seq)
         if length(seq[i]) != ncols
@@ -234,3 +234,5 @@ function sexp{A<:DNAAlphabet}(::Type{RawSxp}, seq::Vector{BioSequence{A}})
     unprotect(1)
     return ra
 end
+
+sexp(seq::Vector{BioSequence{A}}) where {A<:DNAAlphabet} = sexp(RawSxp, seq)
