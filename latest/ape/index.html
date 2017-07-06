@@ -311,6 +311,7 @@
 <p>The <code>BioBridgeR.APE</code> provides a bitstype of <code>DNAbin</code> which inherits from the abstract type <code>NucleicAcid</code> from <a href="https://github.com/BioJulia/BioSymbols.jl">BioSymbols.jl</a>. <code>BioBridgeR.APE.DNAbin</code> variables then can be created and used to represent nucleic acid data, just as you can with the <code>DNA</code> and <code>RNA</code> defined in BioSymbols.jl. They work with the methods defined in BioSymbols.jl:</p>
 <div class="codehilite"><pre><span></span>julia&gt; using BioSequences, RCall, BioBridgeR.APE
 WARNING: Method definition ==(Base.Nullable{S}, Base.Nullable{T}) in module Base at nullable.jl:238 overwritten in module NullableArrays at /home/travis/.julia/v0.6/NullableArrays/src/operators.jl:128.
+WARNING: Method definition promote_rule(Type{IntervalSets.ClosedInterval{T}}, Type{IntervalSets.ClosedInterval{S}}) in module IntervalSets at /home/travis/.julia/v0.6/IntervalSets/src/closed.jl:86 overwritten in module AxisArrays at /home/travis/.julia/v0.6/AxisArrays/src/intervals.jl:23.
 
 julia&gt; ispurine(DNAbin_A)
 true
@@ -393,7 +394,7 @@ julia&gt; @rget woodmouse
  <span class="n">GGGGG</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="p">@</span><span class="n">rput</span> <span class="n">sequences</span><span class="o">::</span><span class="n">RawSxp</span>
-<span class="n">Ptr</span><span class="p">{</span><span class="n">RCall</span><span class="p">.</span><span class="n">RawSxp</span><span class="p">}</span> <span class="mh">@0x00000000071a2528</span>
+<span class="n">Ptr</span><span class="p">{</span><span class="n">RCall</span><span class="p">.</span><span class="n">RawSxp</span><span class="p">}</span> <span class="mh">@0x00000000075ec838</span>
 
 <span class="n">julia</span><span class="o">&gt;</span> <span class="n">R</span><span class="s">&quot;sequences&quot;</span>
 <span class="n">RCall</span><span class="p">.</span><span class="n">RObject</span><span class="p">{</span><span class="n">RCall</span><span class="p">.</span><span class="n">RawSxp</span><span class="p">}</span>
