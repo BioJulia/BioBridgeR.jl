@@ -192,6 +192,9 @@ function rcopy(::Type{Vector{DNASequence}}, rs::Ptr{RawSxp})
     try
         # Check class of RawSxp.
         check_class(rs)
+
+        nSeq, seqLen = size(rs)
+
         # Initialize the output vector of biological sequences.
         seqs = Vector{DNASequence}(nSeq)
         for i in 1:nSeq
