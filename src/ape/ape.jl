@@ -37,7 +37,7 @@ using BioSymbols: DNA, iscertain, isgap
 import BioSymbols: BioSymbols, NucleicAcid
 using BioSequences: BioSequence, DNASequence, DNAAlphabet
 using Twiddle: swapbits
-using RCall: RawSxp, RClass, protect, unprotect, isObject, isS4, rcall_p, allocArray, setclass!
+using RCall: RawSxp, RClass, protect, unprotect, isObject, isS4, rcall_p, allocArray, setclass!, unsafe_array
 import RCall: rcopy, rcopytype, sexp
 
 include("dnabin.jl")
