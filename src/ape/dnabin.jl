@@ -181,6 +181,7 @@ function rcopy(::Type{Array{DNA, 2}}, rs::Ptr{RawSxp})
         @inbounds for i in 1:endof(rarr)
             jarr[i] = convert(DNA, _raw_to_DNA(rarr[i]))
         end
+        return jarr
     finally
         unprotect(1)
     end
