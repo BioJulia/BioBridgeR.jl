@@ -177,7 +177,9 @@ function rcopy(::Type{Array{DNA, 2}}, rs::Ptr{RawSxp})
         # Check class of RawSxp.
         check_class(rs)
         ra = unsafe_array(rs)
-        return convert(Array{DNA, 2}, _raw_to_DNA.(ra))
+        ja = similar(ra, DNA)
+        ja .= _raw_to_DNA.(ra)
+        return ja
     finally
         unprotect(1)
     end
