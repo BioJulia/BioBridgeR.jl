@@ -189,19 +189,13 @@ function rcopy(::Type{Vector{DNASequence}}, rs::Ptr{RawSxp})
     # Protect the RawSxp from GC.
     protect(rs)
     try
-        # Check class of RawSxp.
-        check_class(rs)
-
-        nSeq, seqLen = size(rs)
+        nucs = rcopy(Array{DNA, 2}, rs)
+        nSeq, seqLen = size(nucs)
 
         # Initialize the output vector of biological sequences.
         seqs = Vector{DNASequence}(nSeq)
-        for i in 1:nSeq
-            seqs[i] = DNASequence(seqLen)
-        end
-        # Fill output sequences, with data from rs.
-        @inbounds for i ∈ 1:nSeq, j ∈ 1:seqLen
-            seqs[i][j] = DNA(_raw_to_DNA(rs[i, j]))
+        @inbounds for i in 1:nSeq
+            seqs[i] = DNASequence(nucs[i,:])
         end
         return seqs
     finally
