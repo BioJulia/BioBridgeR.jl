@@ -159,23 +159,15 @@ end
 end
 
 function rcopy(::Type{Array{DNAbin, 2}}, rs::Ptr{RawSxp})
-    # Check class of RawSxp.
-    check_class(rs)
-
     # Protect the RawSxp from GC.
     protect(rs)
-
-    # Initialize the output array.
-    seqs = Array{DNAbin, 2}(size(rs))
-
-    # Fill the array.
-    @inbounds for i ∈ 1:length(rs)
-        seqs[i] = DNAbin(rs[i])
+    try
+        # Check class of RawSxp.
+        check_class(rs)
+        return convert(Array{DNAbin, 2}, RCall.unsafe_array(rs))
+    finally
+        unprotect(1)
     end
-
-    # We no longer need to work with rs, stop protecting it from GC.
-    unprotect(1)
-    return seqs
 end
 
 function rcopy(::Type{Vector{DNASequence}}, rs::Ptr{RawSxp})
@@ -184,8 +176,6 @@ function rcopy(::Type{Vector{DNASequence}}, rs::Ptr{RawSxp})
 
     # Protect the RawSxp from GC.
     protect(rs)
-
-    nSeq, seqLen = size(rs)
 
     # Initialize the output vector of biological sequences.
     seqs = Vector{DNASequence}(nSeq)
