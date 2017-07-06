@@ -159,48 +159,48 @@ end
 end
 
 function rcopy(::Type{Array{DNAbin, 2}}, rs::Ptr{RawSxp})
-    # Check class of RawSxp.
-    check_class(rs)
-
     # Protect the RawSxp from GC.
     protect(rs)
-
-    # Initialize the output array.
-    seqs = Array{DNAbin, 2}(size(rs))
-
-    # Fill the array.
-    @inbounds for i ∈ 1:length(rs)
-        seqs[i] = DNAbin(rs[i])
+    try
+        # Check class of RawSxp.
+        check_class(rs)
+        return convert(Array{DNAbin, 2}, unsafe_array(rs))
+    finally
+        unprotect(1)
     end
+end
 
-    # We no longer need to work with rs, stop protecting it from GC.
-    unprotect(1)
-    return seqs
+function rcopy(::Type{Array{DNA, 2}}, rs::Ptr{RawSxp})
+    # Protect the RawSxp from GC.
+    protect(rs)
+    try
+        # Check class of RawSxp.
+        check_class(rs)
+        ra = unsafe_array(rs)
+        ja = similar(ra, DNA)
+        ja .= _raw_to_DNA.(ra)
+        return ja
+    finally
+        unprotect(1)
+    end
 end
 
 function rcopy(::Type{Vector{DNASequence}}, rs::Ptr{RawSxp})
-    # Check class of RawSxp.
-    check_class(rs)
-
     # Protect the RawSxp from GC.
     protect(rs)
+    try
+        nucs = rcopy(Array{DNA, 2}, rs)
+        nSeq, seqLen = size(nucs)
 
-    nSeq, seqLen = size(rs)
-
-    # Initialize the output vector of biological sequences.
-    seqs = Vector{DNASequence}(nSeq)
-    for i in 1:nSeq
-        seqs[i] = DNASequence(seqLen)
+        # Initialize the output vector of biological sequences.
+        seqs = Vector{DNASequence}(nSeq)
+        @inbounds for i in 1:nSeq
+            seqs[i] = DNASequence(nucs[i,:])
+        end
+        return seqs
+    finally
+        unprotect(1)
     end
-
-    # Fill output sequences, with data from rs.
-    @inbounds for i ∈ 1:nSeq, j ∈ 1:seqLen
-        seqs[i][j] = DNA(_raw_to_DNA(rs[i, j]))
-    end
-
-    # We no longer need to work with rs, stop protecting it from GC.
-    unprotect(1)
-    return seqs
 end
 
 @inline function rcopytype(::Type{RClass{:DNAbin}}, s::Ptr{RawSxp})

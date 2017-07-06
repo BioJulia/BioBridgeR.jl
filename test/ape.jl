@@ -160,9 +160,13 @@
         dba = [DNAbin_A  DNAbin_G  DNAbin_C    DNAbin_T
                DNAbin_T  DNAbin_A  DNAbin_G    DNAbin_C
                DNAbin_C  DNAbin_T  DNAbin_Gap  DNAbin_M]
+        bjdba = [DNA_A  DNA_G  DNA_C    DNA_T
+                 DNA_T  DNA_A  DNA_G    DNA_C
+                 DNA_C  DNA_T  DNA_Gap  DNA_M]
         vs = DNASequence[dna"AGCT", dna"TAGC", dna"CT-M"]
         @test rcopy(Array{DNAbin, 2}, rseq) == dba
         @test rcopy(Vector{DNASequence}, rseq) == vs
+        @test rcopy(Array{DNA, 2}, rseq) == bjdba
         @test all(i == j for (i, j) in zip(rseq, RObject(RCall.sexp(RCall.RawSxp, dba))))
         @test all(i == j for (i, j) in zip(rseq, RObject(RCall.sexp(RCall.RawSxp, vs))))
     end
