@@ -87,44 +87,44 @@
         @test !iscompatible(DNAbin_C, DNAbin_A)
         @test !iscompatible(DNAbin_C, DNAbin_R)
 
-        for x in alphabet(DNAbin)
+        for x ∈ alphabet(DNAbin)
             @test iscompatible(x, DNAbin_N) == (x != DNAbin_Gap)
             @test iscompatible(DNAbin_N, x) == (x != DNAbin_Gap)
         end
     end
 
     @testset "isambiguous" begin
-        for nt in alphabet(DNAbin)
+        for nt ∈ alphabet(DNAbin)
             @test isambiguous(nt) == (nt ∉ (DNAbin_A, DNAbin_C, DNAbin_G, DNAbin_T, DNAbin_Gap))
         end
     end
 
     @testset "isGC" begin
-        for nt in alphabet(DNAbin)
+        for nt ∈ alphabet(DNAbin)
             @test isGC(nt) == (nt ∈ (DNAbin_G, DNAbin_C, DNAbin_S))
         end
     end
 
     @testset "ispurine" begin
-        for nt in alphabet(DNAbin)
+        for nt ∈ alphabet(DNAbin)
             @test ispurine(nt) == (nt == DNAbin_A || nt == DNAbin_G || nt == DNAbin_R)
         end
     end
 
     @testset "ispyrimidine" begin
-        for nt in alphabet(DNAbin)
+        for nt ∈ alphabet(DNAbin)
             @test ispyrimidine(nt) == (nt == DNAbin_T || nt == DNAbin_C || nt == DNAbin_Y)
         end
     end
 
     @testset "iscertain" begin
-        for nt in alphabet(DNAbin)
+        for nt ∈ alphabet(DNAbin)
             @test iscertain(nt) == (nt ∈ (DNAbin_A, DNAbin_G, DNAbin_T, DNAbin_C,))
         end
     end
 
     @testset "isgap" begin
-        for nt in alphabet(DNAbin)
+        for nt ∈ alphabet(DNAbin)
             @test isgap(nt) == (nt === gap(DNAbin))
         end
     end
@@ -140,7 +140,7 @@
 
     @testset "show" begin
         buf = IOBuffer()
-        for nt in [DNAbin_A, DNAbin_C, DNAbin_G, DNAbin_T, DNAbin_N, DNAbin_Gap]
+        for nt ∈ [DNAbin_A, DNAbin_C, DNAbin_G, DNAbin_T, DNAbin_N, DNAbin_Gap]
             show(buf, nt)
             write(buf, ' ')
         end
@@ -167,8 +167,8 @@
         @test rcopy(Array{DNAbin, 2}, rseq) == dba
         @test rcopy(Vector{DNASequence}, rseq) == vs
         @test rcopy(Array{DNA, 2}, rseq) == bjdba
-        @test all(i == j for (i, j) in zip(rseq, RObject(RCall.sexp(RCall.RawSxp, dba))))
-        @test all(i == j for (i, j) in zip(rseq, RObject(RCall.sexp(RCall.RawSxp, vs))))
+        @test all(i == j for (i, j) ∈ zip(rseq, RObject(RCall.sexp(RCall.RawSxp, dba))))
+        @test all(i == j for (i, j) ∈ zip(rseq, RObject(RCall.sexp(RCall.RawSxp, vs))))
     end
 
 end
